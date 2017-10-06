@@ -3,6 +3,7 @@ package org.apache.cordova.labs.keyboard;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.os.Build;
 import android.view.inputmethod.InputMethodManager;
@@ -23,7 +24,7 @@ public class Keyboard extends CordovaPlugin {
     }
 
 	@Override
-	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
 		Activity activity = this.cordova.getActivity();
 		InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 

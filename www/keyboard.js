@@ -21,7 +21,8 @@
 
 var argscheck = require('cordova/argscheck'),
     utils = require('cordova/utils'),
-    exec = require('cordova/exec');
+    exec = require('cordova/exec'),
+    channel = require('cordova/channel');
    
 var Keyboard = function() {
 };
