@@ -103,4 +103,19 @@ Keyboard.hide = function() {
 Keyboard.isVisible = false;
 Keyboard.automaticScrollToTopOnHiding = false;
 
+channel.onCordovaReady.subscribe(function() {
+    function success(msg) {
+        var action = msg.charAt(0);
+        if ( action === 'S' ) {
+            Keyboard.isVisible = true;
+            cordova.fireWindowEvent('keyboardDidShow');
+        } else if ( action === 'H' ) {
+            Keyboard.isVisible = false;
+            cordova.fireWindowEvent('keyboardDidHide');
+        }
+    }
+    exec(success, null, 'Keyboard', 'init', []);
+
+});
+
 module.exports = Keyboard;
