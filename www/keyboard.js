@@ -108,11 +108,12 @@ channel.onCordovaReady.subscribe(function() {
     function success(msg) {
         var action = msg.charAt(0);
         if ( action === 'S' ) {
+            var keyboardHeight = msg.substr(1);
             Keyboard.isVisible = true;
-            cordova.fireWindowEvent('keyboardDidShow');
+            cordova.fireWindowEvent('keyboardDidShow', { 'keyboardHeight': + keyboardHeight });
         } else if ( action === 'H' ) {
             Keyboard.isVisible = false;
-            cordova.fireWindowEvent('keyboardDidHide');
+            cordova.fireWindowEvent('keyboardDidHide', { 'keyboardHeight': 0 });
         }
     }
     exec(success, null, 'Keyboard', 'init', []);
