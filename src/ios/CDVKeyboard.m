@@ -201,6 +201,25 @@ static IMP WKOriginalImp;
 
     // A view's frame is in its superview's coordinate system so we need to convert again
     self.webView.frame = [self.webView.superview convertRect:screen fromView:self.webView];
+    
+    if (_shrinkSubViews) {
+        // Forces scrollView and its content to be shrunk the same way as webView to fix the layout
+        // problems the iOS SDK 12 has introduced when the viewport-fit=cover property is set
+        UIView *HTMLRenderView = nil;
+        NSString *subViewClassName = nil;
+        NSString *UIClassString = [@[@"UI", @"Web", @"Browser", @"View"] componentsJoinedByString:@""];
+        for (UIView *subview in self.webView.scrollView.subviews) {
+            subViewClassName = NSStringFromClass([subview class]);
+            if ([subViewClassName isEqualToString:UIClassString]) {
+                HTMLRenderView = subview;
+                break;
+            }
+        }
+        self.webView.scrollView.frame = screen;
+        if (HTMLRenderView) {
+            HTMLRenderView.frame = [self.webView.scrollView convertRect:screen fromView:self.webView];
+        }
+    }
 }
 
 #pragma mark UIScrollViewDelegate
@@ -208,10 +227,17 @@ static IMP WKOriginalImp;
 - (void)scrollViewDidScroll:(UIScrollView*)scrollView
 {
     if (_shrinkView && _keyboardIsVisible) {
-        CGFloat maxY = scrollView.contentSize.height - scrollView.bounds.size.height;
-        if (scrollView.bounds.origin.y > maxY) {
-            scrollView.bounds = CGRectMake(scrollView.bounds.origin.x, maxY,
-                                           scrollView.bounds.size.width, scrollView.bounds.size.height);
+        if (_shrinkSubViews) {
+            // If all the views in the hierarchy have the same size, scrollView won't be
+            // scrollable and its content should always be placed with no offset from it
+            CGPoint offset = CGPointMake(0.0f, 0.0f);
+            [self.webView.scrollView setContentOffset:offset animated:NO];
+        } else {
+            CGFloat maxY = scrollView.contentSize.height - scrollView.bounds.size.height;
+            if (scrollView.bounds.origin.y > maxY) {
+                scrollView.bounds = CGRectMake(scrollView.bounds.origin.x, maxY,
+                                               scrollView.bounds.size.width, scrollView.bounds.size.height);
+            }
         }
     }
 }
@@ -220,16 +246,27 @@ static IMP WKOriginalImp;
 
 - (void)shrinkView:(CDVInvokedUrlCommand*)command
 {
+    id value = nil;
+    
     if (command.arguments.count > 0) {
-        id value = [command.arguments objectAtIndex:0];
+        value = [command.arguments objectAtIndex:0];
         if (!([value isKindOfClass:[NSNumber class]])) {
             value = [NSNumber numberWithBool:NO];
         }
-
         self.shrinkView = [value boolValue];
     }
     
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:self.shrinkView]
+    if (command.arguments.count > 1) {
+        value = [command.arguments objectAtIndex:1];
+        if (!([value isKindOfClass:[NSNumber class]])) {
+            value = [NSNumber numberWithBool:NO];
+        }
+        self.shrinkSubViews = [value boolValue];
+    }
+    
+    NSArray *result = @[[NSNumber numberWithBool:self.shrinkView], [NSNumber numberWithBool:self.shrinkSubViews]];
+    
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:result]
                                 callbackId:command.callbackId];
 }
 
