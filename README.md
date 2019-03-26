@@ -42,11 +42,13 @@ From github latest (may not be stable)
 
 Shrink the WebView when the keyboard comes up.
 
-    Keyboard.shrinkView(value, successCallback);
+    Keyboard.shrinkView(shrink, forceShrink, successCallback);
 
 #### Description
 
 Set to true to shrink the WebView when the keyboard comes up. The WebView shrinks instead of the viewport shrinking and the page scrollable. This applies to apps that position their elements relative to the bottom of the WebView. This is the default behaviour on Android, and makes a lot of sense when building apps as opposed to webpages.
+
+`forceShrink` (Boolean) parameter has been added to indicate if WebView's sub-views should be also shrunk or not. If set to true, it forces scrollView and its content (UIWebBrowserView) to be resized the same way as webView on keyboard events. It is intended to fix the layout problems the iOS SDK 12 has introduced when the keyboard is shown / hidden and the `viewport-fit=cover` property is set. See https://github.com/apache/cordova-ios/issues/472.
 
 
 #### Supported Platforms
@@ -56,8 +58,10 @@ Set to true to shrink the WebView when the keyboard comes up. The WebView shrink
 #### Quick Example
 
     Keyboard.shrinkView(true);
-    Keyboard.shrinkView(false);
-    Keyboard.shrinkView(null, function (currentValue) { console.log(currentValue); });
+    Keyboard.shrinkView(true, true);
+    Keyboard.shrinkView(true, false, function (statesArray) { console.log(statesArray); });
+
+
 
 ## Keyboard.hideFormAccessoryBar
 
@@ -100,7 +104,7 @@ Set to true to disable scrolling when the WebView is shrunk.
     Keyboard.disableScrollingInShrinkView(true);
     Keyboard.disableScrollingInShrinkView(false);
     Keyboard.disableScrollingInShrinkView(null, function (currentValue) { console.log(currentValue); });
- 
+
 ## Keyboard.hide
 
 Hide the keyboard

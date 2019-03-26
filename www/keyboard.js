@@ -27,12 +27,11 @@ var argscheck = require('cordova/argscheck'),
 var Keyboard = function() {
 };
 
-Keyboard.shrinkView = function(shrink, success) {
-    if (shrink !== null && shrink !== undefined) {
-        exec(success, null, "Keyboard", "shrinkView", [shrink]);
-    } else {
-        exec(success, null, "Keyboard", "shrinkView", []);
-    }
+Keyboard.shrinkView = function(shrink, forceShrink, success) {
+    var args = [];
+    if (shrink !== null && shrink !== undefined) args.push(shrink);
+    if (forceShrink !== null && forceShrink !== undefined) args.push(forceShrink);
+    exec(success, null, "Keyboard", "shrinkView", args);
 };
 
 Keyboard.hideFormAccessoryBar = function(hide, success) {
