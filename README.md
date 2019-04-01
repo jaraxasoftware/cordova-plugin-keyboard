@@ -186,8 +186,9 @@ after keyboard is hiding.
 
 This event is fired when keyboard fully shown.
 
-    window.addEventListener('keyboardDidShow', function () {
+    window.addEventListener('keyboardDidShow', function (event) {
         // Describe your logic which will be run each time keyboard is shown.
+        console.log(event.keyboardHeight);
     });
 
 #### Description
@@ -203,8 +204,9 @@ Attach handler to this event to be able to receive notification when keyboard is
 
 This event is fired when the keyboard is fully closed.
 
-    window.addEventListener('keyboardDidHide', function () {
+    window.addEventListener('keyboardDidHide', function (event) {
         // Describe your logic which will be run each time keyboard is closed.
+        console.log(event.keyboardHeight);
     });
 
 #### Description
@@ -220,8 +222,9 @@ Attach handler to this event to be able to receive notification when keyboard is
 
 This event fires before keyboard will be shown.
 
-    window.addEventListener('keyboardWillShow', function () {
+    window.addEventListener('keyboardWillShow', function (event) {
         // Describe your logic which will be run each time when keyboard is about to be shown.
+        console.log(event.keyboardHeight);
     });
 
 #### Description
@@ -237,8 +240,9 @@ Attach handler to this event to be able to receive notification when keyboard is
 
 This event is fired when the keyboard is fully closed.
 
-    window.addEventListener('keyboardWillHide', function () {
+    window.addEventListener('keyboardWillHide', function (event) {
         // Describe your logic which will be run each time when keyboard is about to be closed.
+        console.log(event.keyboardHeight);
     });
 
 #### Description
@@ -255,13 +259,13 @@ Attach handler to this event to be able to receive notification when keyboard is
 This event is fired when the keyboard is fully closed.
 
     window.addEventListener('keyboardHeightWillChange', function (event) {
-        // Describe your logic which will be run each time when keyboard is about to be closed.
+        // Describe your logic which will be run each time when keyboard is about to be shown or closed.
         console.log(event.keyboardHeight);
     });
 
 #### Description
 
-Attach handler to this event to be able to receive notification when keyboard is about to be closed.
+Attach handler to this event in order to receive a notification when the keyboard is about to be shown or closed.
 
 
 #### Supported Platforms
