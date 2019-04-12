@@ -51,7 +51,12 @@
 
     setting = @"KeyboardShrinksView";
     if ([self settingForKey:setting]) {
-        self.shrinkView = [(NSNumber*)[self settingForKey:setting] boolValue];
+        if ([[self settingForKey:setting] isEqualToString:@"force"]) {
+            self.shrinkView = YES;
+            self.shrinkSubViews = YES;
+        } else {
+            self.shrinkView = [(NSNumber*)[self settingForKey:setting] boolValue];
+        }
     }
 
     setting = @"DisableScrollingWhenKeyboardShrinksView";
