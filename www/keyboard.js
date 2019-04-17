@@ -50,25 +50,25 @@ Keyboard.disableScrollingInShrinkView = function(disable, success) {
     }
 };
 
-Keyboard.fireOnShow = function() {
+Keyboard.fireOnShow = function(keyboardHeight) {
     Keyboard.isVisible = true;
-    cordova.fireWindowEvent('keyboardDidShow');
+    cordova.fireWindowEvent('keyboardDidShow', { 'keyboardHeight': keyboardHeight });
 
     if(Keyboard.onshow) {
-	Keyboard.onshow();
+    	Keyboard.onshow(keyboardHeight);
     }
 };
 
-Keyboard.fireOnHide = function() {
+Keyboard.fireOnHide = function(keyboardHeight) {
     Keyboard.isVisible = false;
-    cordova.fireWindowEvent('keyboardDidHide');
+    cordova.fireWindowEvent('keyboardDidHide', { 'keyboardHeight': keyboardHeight });
 
     if(Keyboard.onhide) {
-	Keyboard.onhide();
+    	Keyboard.onhide(keyboardHeight);
     }
 };
 
-Keyboard.fireOnHiding = function() {
+Keyboard.fireOnHiding = function(keyboardHeight) {
     // Automatic scroll to the top of the page
     // to prevent quirks when using position:fixed elements
     // inside WebKit browsers (iOS specifically).
@@ -77,18 +77,18 @@ Keyboard.fireOnHiding = function() {
         document.body.scrollLeft = 0;
     }
 
-    cordova.fireWindowEvent('keyboardWillHide');
+    cordova.fireWindowEvent('keyboardWillHide', { 'keyboardHeight': keyboardHeight });
 
     if(Keyboard.onhiding) {
-	Keyboard.onhiding();
+    	Keyboard.onhiding(keyboardHeight);
     }
 };
 
-Keyboard.fireOnShowing = function() {
-    cordova.fireWindowEvent('keyboardWillShow');
+Keyboard.fireOnShowing = function(keyboardHeight) {
+    cordova.fireWindowEvent('keyboardWillShow', { 'keyboardHeight': keyboardHeight });
 
     if(Keyboard.onshowing) {
-	Keyboard.onshowing();
+    	Keyboard.onshowing(keyboardHeight);
     }
 };
 

@@ -51,7 +51,12 @@
 
     setting = @"KeyboardShrinksView";
     if ([self settingForKey:setting]) {
-        self.shrinkView = [(NSNumber*)[self settingForKey:setting] boolValue];
+        if ([[self settingForKey:setting] isEqualToString:@"force"]) {
+            self.shrinkView = YES;
+            self.shrinkSubViews = YES;
+        } else {
+            self.shrinkView = [(NSNumber*)[self settingForKey:setting] boolValue];
+        }
     }
 
     setting = @"DisableScrollingWhenKeyboardShrinksView";
@@ -61,33 +66,44 @@
 
     NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
     __weak CDVKeyboard* weakSelf = self;
+    
+    CGFloat (^calculateKeyboardHeight)(NSNotification *) = ^ CGFloat (NSNotification *notification) {
+        CGRect screen = [[UIScreen mainScreen] bounds];
+        CGRect keyboard = ((NSValue*)notification.userInfo[@"UIKeyboardFrameEndUserInfoKey"]).CGRectValue;
+        CGRect intersection = CGRectIntersection(screen, keyboard);
+        return MIN(intersection.size.width, intersection.size.height);
+    };
 
     _keyboardShowObserver = [nc addObserverForName:UIKeyboardDidShowNotification
                                             object:nil
                                              queue:[NSOperationQueue mainQueue]
                                         usingBlock:^(NSNotification* notification) {
-            [weakSelf.commandDelegate evalJs:@"Keyboard.fireOnShow();"];
+                                            CGFloat height = calculateKeyboardHeight(notification);
+                                            [weakSelf.commandDelegate evalJs: [NSString stringWithFormat:@"Keyboard.fireOnShow(%f);", height]];
                                         }];
     _keyboardHideObserver = [nc addObserverForName:UIKeyboardDidHideNotification
                                             object:nil
                                              queue:[NSOperationQueue mainQueue]
                                         usingBlock:^(NSNotification* notification) {
-            [weakSelf.commandDelegate evalJs:@"Keyboard.fireOnHide();"];
+                                            CGFloat height = calculateKeyboardHeight(notification);
+                                            [weakSelf.commandDelegate evalJs: [NSString stringWithFormat:@"Keyboard.fireOnHide(%f);", height]];
                                         }];
 
     _keyboardWillShowObserver = [nc addObserverForName:UIKeyboardWillShowNotification
                                                 object:nil
                                                  queue:[NSOperationQueue mainQueue]
                                             usingBlock:^(NSNotification* notification) {
-            [weakSelf.commandDelegate evalJs:@"Keyboard.fireOnShowing();"];
-            weakSelf.keyboardIsVisible = YES;
+                                                CGFloat height = calculateKeyboardHeight(notification);
+                                                [weakSelf.commandDelegate evalJs: [NSString stringWithFormat:@"Keyboard.fireOnShowing(%f);", height]];
+                                                weakSelf.keyboardIsVisible = YES;
                                             }];
     _keyboardWillHideObserver = [nc addObserverForName:UIKeyboardWillHideNotification
                                                 object:nil
                                                  queue:[NSOperationQueue mainQueue]
                                             usingBlock:^(NSNotification* notification) {
-            [weakSelf.commandDelegate evalJs:@"Keyboard.fireOnHiding();"];
-            weakSelf.keyboardIsVisible = NO;
+                                                CGFloat height = calculateKeyboardHeight(notification);
+                                                [weakSelf.commandDelegate evalJs: [NSString stringWithFormat:@"Keyboard.fireOnHiding(%f);", height]];
+                                                weakSelf.keyboardIsVisible = NO;
                                             }];
 
     _shrinkViewKeyboardWillChangeFrameObserver = [nc addObserverForName:UIKeyboardWillChangeFrameNotification
@@ -95,10 +111,7 @@
                                                                   queue:[NSOperationQueue mainQueue]
                                                              usingBlock:^(NSNotification* notification) {
                                                                  [weakSelf performSelector:@selector(shrinkViewKeyboardWillChangeFrame:) withObject:notification afterDelay:0];
-                                                                 CGRect screen = [[UIScreen mainScreen] bounds];
-                                                                 CGRect keyboard = ((NSValue*)notification.userInfo[@"UIKeyboardFrameEndUserInfoKey"]).CGRectValue;
-                                                                 CGRect intersection = CGRectIntersection(screen, keyboard);
-                                                                 CGFloat height = MIN(intersection.size.width, intersection.size.height);
+                                                                 CGFloat height = calculateKeyboardHeight(notification);
                                                                  [weakSelf.commandDelegate evalJs: [NSString stringWithFormat:@"cordova.fireWindowEvent('keyboardHeightWillChange', { 'keyboardHeight': %f })", height]];
                                                              }];
 

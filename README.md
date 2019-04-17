@@ -1,6 +1,6 @@
 # cordova-plugin-keyboard
 
-> This plugin provides the `Keyboard` object which has some functions to customize and control the keyboard. It also supports the __HideKeyboardFormAccessoryBar__ (boolean) and __KeyboardShrinksView__ (boolean) preferences in config.xml.
+> This plugin provides the `Keyboard` object which has some functions to customize and control the keyboard. It also supports the __HideKeyboardFormAccessoryBar__ (boolean) and __KeyboardShrinksView__ (accepted values: true, false and force (to also shrink the subviews, see Keyboard.shrinkView method below)) preferences in config.xml.
 
 This plugin has only been tested in Cordova 3.2 or greater, and its use in previous Cordova versions is not recommended (potential conflict with keyboard customization code present in the core in previous Cordova versions). 
 
@@ -50,6 +50,8 @@ Set to true to shrink the WebView when the keyboard comes up. The WebView shrink
 
 `forceShrink` (Boolean) parameter has been added to indicate if WebView's sub-views should be also shrunk or not. If set to true, it forces scrollView and its content (UIWebBrowserView) to be resized the same way as webView on keyboard events. It is intended to fix the layout problems the iOS SDK 12 has introduced when the keyboard is shown / hidden and the `viewport-fit=cover` property is set. See https://github.com/apache/cordova-ios/issues/472.
 
+This method can be used as a getter by setting the first two parameters to null.
+
 
 #### Supported Platforms
 
@@ -60,6 +62,9 @@ Set to true to shrink the WebView when the keyboard comes up. The WebView shrink
     Keyboard.shrinkView(true);
     Keyboard.shrinkView(true, true);
     Keyboard.shrinkView(true, false, function (statesArray) { console.log(statesArray); });
+    Keyboard.shrinkView(null, null, function (currentsStatesArray) { 
+    	console.log(currentStatesArray); 
+    });
 
 
 
@@ -72,6 +77,8 @@ Hide the keyboard toolbar.
 #### Description
 
 Set to true to hide the additional toolbar that is on top of the keyboard. This toolbar features the Prev, Next, and Done buttons.
+
+This method can be used as a getter by setting the first parameter to null.
 
 
 #### Supported Platforms
@@ -93,6 +100,8 @@ Disable scrolling when the the WebView is shrunk.
 #### Description
 
 Set to true to disable scrolling when the WebView is shrunk.
+
+This method can be used as a getter by setting the first parameter to null.
 
 
 #### Supported Platforms
@@ -186,8 +195,9 @@ after keyboard is hiding.
 
 This event is fired when keyboard fully shown.
 
-    window.addEventListener('keyboardDidShow', function () {
+    window.addEventListener('keyboardDidShow', function (event) {
         // Describe your logic which will be run each time keyboard is shown.
+        console.log(event.keyboardHeight);
     });
 
 #### Description
@@ -203,8 +213,9 @@ Attach handler to this event to be able to receive notification when keyboard is
 
 This event is fired when the keyboard is fully closed.
 
-    window.addEventListener('keyboardDidHide', function () {
+    window.addEventListener('keyboardDidHide', function (event) {
         // Describe your logic which will be run each time keyboard is closed.
+        console.log(event.keyboardHeight);
     });
 
 #### Description
@@ -220,8 +231,9 @@ Attach handler to this event to be able to receive notification when keyboard is
 
 This event fires before keyboard will be shown.
 
-    window.addEventListener('keyboardWillShow', function () {
+    window.addEventListener('keyboardWillShow', function (event) {
         // Describe your logic which will be run each time when keyboard is about to be shown.
+        console.log(event.keyboardHeight);
     });
 
 #### Description
@@ -237,8 +249,9 @@ Attach handler to this event to be able to receive notification when keyboard is
 
 This event is fired when the keyboard is fully closed.
 
-    window.addEventListener('keyboardWillHide', function () {
+    window.addEventListener('keyboardWillHide', function (event) {
         // Describe your logic which will be run each time when keyboard is about to be closed.
+        console.log(event.keyboardHeight);
     });
 
 #### Description
@@ -255,13 +268,13 @@ Attach handler to this event to be able to receive notification when keyboard is
 This event is fired when the keyboard is fully closed.
 
     window.addEventListener('keyboardHeightWillChange', function (event) {
-        // Describe your logic which will be run each time when keyboard is about to be closed.
+        // Describe your logic which will be run each time when keyboard is about to be shown or closed.
         console.log(event.keyboardHeight);
     });
 
 #### Description
 
-Attach handler to this event to be able to receive notification when keyboard is about to be closed.
+Attach handler to this event in order to receive a notification when the keyboard is about to be shown or closed.
 
 
 #### Supported Platforms
